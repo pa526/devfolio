@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  githubId      String   @unique
+  username      String   @unique
+  name          String?
+  avatarUrl     String?
+  bio           String?
+  accessToken   String?
+  isPublished   Boolean  @default(false)
+  publishedSlug String?  @unique
+  theme         String   @default("dark")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  repos         Repo[]
+}
+
+model Repo {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  githubRepoId     String
+  name             String
+  fullName         String?
+  description      String?
+  readmeRaw        String?
+  language         String?
+  stars            Int       @default(0)
+  forks            Int       @default(0)
+  url              String?
+  lastUpdated      DateTime?
+  aiSummary        String?
+  aiTags           String    @default("[]")
+  aiHighlight      String?
+  isPinned         Boolean   @default(false)
+  isHidden         Boolean   @default(false)
+  summaryUpdatedAt DateTime?
+  createdAt        DateTime  @default(now())
+
+  @@unique([userId, githubRepoId])
+}
